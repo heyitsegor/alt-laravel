@@ -24,22 +24,14 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Route::get('/users', function () {
-//     $users = User::orderBy('name')->orderByDesc('created_at')->get();
-//     return view('users', ['users' => $users]);
-// })->name('users');
 Route::get('/users', function () {
-    $sort = request('sort');
-    $users = User::query();
+    $sort = request()->query('sort', 'name');
+    $sortOrder = request()->query('sort_order', 'asc');
 
-    if ($sort === 'name') {
-        $users->orderBy('name');
-    } elseif ($sort === 'created_at') {
-        $users->orderBy('created_at');
-    }
+    $users = User::orderBy($sort, $sortOrder)->get();
 
-    return view('users', ['users' => $users->get()]);
-})->name('users');
+    return view('users', compact('users', 'sort', 'sortOrder'));
+})->middleware(['auth', 'verified'])->name('users');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -13,12 +13,18 @@
                         <thead>
                             <tr>
                                 <th>
-                                    <a href="{{ route('users', ['sort' => 'name', 'order' => 'asc']) }}">
+                                    <a href="{{ route('users', ['sort' => 'name', 'sort_order' => $sortOrder === 'asc' && $sort === 'name' ? 'desc' : 'asc']) }}">
                                         Name
                                     </a>
                                 </th>
                                 <th>
-                                    <a href="{{ route('users', ['sort' => 'created_at']) }}">Registration Date/Time</a>
+                                    <!-- <a href="{{ route('users', ['sort' => 'created_at']) }}">Registration Date/Time
+
+                                    </a> -->
+
+                                    <a href="{{ route('users', ['sort' => 'name', 'sort_order' => $sortOrder === 'asc' && $sort === 'name' ? 'desc' : 'asc']) }}">
+                                        Registration Date/Time
+                                    </a>
                                 </th>
                             </tr>
                         </thead>
