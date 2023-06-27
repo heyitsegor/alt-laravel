@@ -18,19 +18,17 @@
                                     </a>
                                 </th>
                                 <th>
-                                    <a href="{{ route('users', ['sort' => 'created_at', 'order' => 'desc']) }}">
-                                        Registration Date
-                                    </a>
+                                    <a href="{{ route('users', ['sort' => 'created_at']) }}">Registration Date/Time</a>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($users as $user)
-                                <tr>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->created_at }}</td>
-                                </tr>
-                            @endforeach
+                        @foreach ($users as $user)
+                            <tr>
+                                <td>{{ $user->name }}</td>
+                                <td>{{ $user->created_at }}</td>
+                            </tr>
+                        @endforeach
                         </tbody>
                     </table>
                 </div>
