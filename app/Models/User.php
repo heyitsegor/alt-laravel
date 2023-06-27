@@ -19,8 +19,14 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
+        'phone',
         'password',
+    ];
+
+    protected static $rules = [
+        'name' => 'required|min:3',
+        'phone' => 'required|regex:/^\+79\d{9}$/',
+        // other rules...
     ];
 
     /**
@@ -39,7 +45,7 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        // 'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 }
