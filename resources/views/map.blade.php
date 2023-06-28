@@ -1,14 +1,12 @@
 <head>
-    <script src="https://api-maps.yandex.ru/3.0/?apikey=<ваш API-ключ>&lang=ru_RU"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=cf986674-7103-4197-9b22-50d1b429afb1&lang=ru_RU"></script>
     <script type="text/javascript">
-        ymaps3.ready.then(init());
+        ymaps.ready(init);
 
         function init() {
-            const map = new ymaps3.YMap(document.getElementById('YMapsID'), {
-                location: {
-                    center: [37.64, 55.76],
-                    zoom: 10
-                }
+            var myMap = new ymaps.Map("map", {
+                center: [55.76, 37.64],
+                zoom: 7
             });
         }
     </script>
