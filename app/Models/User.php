@@ -17,15 +17,11 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'phone',
-        'password',
-    ];
+    protected $fillable = ["name", "phone", "password"];
 
     protected static $rules = [
-        'name' => 'required|min:3',
-        'phone' => 'required|regex:/^\+79\d{9}$/',
+        "name" => "required|min:3",
+        "phone" => 'required|regex:/^\+79\d{9}$/',
         // other rules...
     ];
 
@@ -34,10 +30,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ["password", "remember_token"];
 
     /**
      * The attributes that should be cast.
@@ -46,6 +39,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         // 'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        "password" => "hashed",
     ];
 }

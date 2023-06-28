@@ -21,13 +21,13 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        return view("auth.register");
     }
 
     protected function validator(array $data)
-     {
-         return Validator::make($data, User::$rules);
-     }
+    {
+        return Validator::make($data, User::$rules);
+    }
 
     /**
      * Handle an incoming registration request.
@@ -37,15 +37,21 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'min:3', 'max:255'],
-            'phone' => ['required', 'string', 'max:12', 'regex:/^\+79\d{9}$/', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            "name" => ["required", "string", "min:3", "max:255"],
+            "phone" => [
+                "required",
+                "string",
+                "max:12",
+                'regex:/^\+79\d{9}$/',
+                "unique:" . User::class,
+            ],
+            "password" => ["required", "confirmed", Rules\Password::defaults()],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
+            "name" => $request->name,
+            "phone" => $request->phone,
+            "password" => Hash::make($request->password),
         ]);
 
         event(new Registered($user));

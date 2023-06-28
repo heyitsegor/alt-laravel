@@ -4,7 +4,6 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,27 +15,43 @@ use App\Models\User;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get("/", function () {
+    return view("welcome");
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get("/dashboard", function () {
+    return view("dashboard");
+})
+    ->middleware(["auth", "verified"])
+    ->name("dashboard");
 
-Route::get('/users', function () {
-    $sort = request()->query('sort', 'name');
-    $sortOrder = request()->query('sort_order', 'asc');
+Route::get("/users", function () {
+    $sort = request()->query("sort", "name");
+    $sortOrder = request()->query("sort_order", "asc");
 
     $users = User::orderBy($sort, $sortOrder)->get();
 
-    return view('users', compact('users', 'sort', 'sortOrder'));
-})->middleware(['auth', 'verified'])->name('users');
+    return view("users", compact("users", "sort", "sortOrder"));
+})
+    ->middleware(["auth", "verified"])
+    ->name("users");
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::get("/map", function () {
+    return view("map");
+})
+    ->middleware(["auth", "verified"])
+    ->name("map");
+
+Route::middleware("auth")->group(function () {
+    Route::get("/profile", [ProfileController::class, "edit"])->name(
+        "profile.edit"
+    );
+    Route::patch("/profile", [ProfileController::class, "update"])->name(
+        "profile.update"
+    );
+    Route::delete("/profile", [ProfileController::class, "destroy"])->name(
+        "profile.destroy"
+    );
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . "/auth.php";

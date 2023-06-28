@@ -15,7 +15,7 @@ class PasswordResetLinkController extends Controller
      */
     public function create(): View
     {
-        return view('auth.forgot-password');
+        return view("auth.forgot-password");
     }
 
     /**
@@ -26,20 +26,19 @@ class PasswordResetLinkController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'phone' => ['required', 'string'],
+            "phone" => ["required", "string"],
             // 'phone' => ['required', 'phone'],
         ]);
 
         // We will send the password reset link to this user. Once we have attempted
         // to send the link, we will examine the response then see the message we
         // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('phone')
-        );
+        $status = Password::sendResetLink($request->only("phone"));
 
         return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('phone'))
-                            ->withErrors(['phone' => __($status)]);
+            ? back()->with("status", __($status))
+            : back()
+                ->withInput($request->only("phone"))
+                ->withErrors(["phone" => __($status)]);
     }
 }

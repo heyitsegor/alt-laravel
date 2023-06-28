@@ -13,28 +13,26 @@
                         <thead>
                             <tr>
                                 <th>
-                                    <a href="{{ route('users', ['sort' => 'name', 'sort_order' => $sortOrder === 'asc' && $sort === 'name' ? 'desc' : 'asc']) }}">
+                                    <a
+                                        href="{{ route('users', ['sort' => 'name', 'sort_order' => $sortOrder === 'asc' && $sort === 'name' ? 'desc' : 'asc']) }}">
                                         Name
                                     </a>
                                 </th>
                                 <th>
-                                    <!-- <a href="{{ route('users', ['sort' => 'created_at']) }}">Registration Date/Time
-
-                                    </a> -->
-
-                                    <a href="{{ route('users', ['sort' => 'name', 'sort_order' => $sortOrder === 'asc' && $sort === 'name' ? 'desc' : 'asc']) }}">
+                                    <a
+                                        href="{{ route('users', ['sort' => 'name', 'sort_order' => $sortOrder === 'asc' && $sort === 'name' ? 'desc' : 'asc']) }}">
                                         Registration Date/Time
                                     </a>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach ($users as $user)
-                            <tr>
-                                <td>{{ $user->name }}</td>
-                                <td>{{ $user->created_at }}</td>
-                            </tr>
-                        @endforeach
+                            @foreach ($users as $user)
+                                <tr>
+                                    <td>{{ $user->name }}</td>
+                                    <td>{{ $user->created_at }}</td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
