@@ -5,23 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class ProfileController extends Controller
+class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $sort = $request->get("sort");
-        $order = $request->get("order", "asc");
+        $sort = request()->query("sort", "name");
+        $sortOrder = request()->query("sort_order", "asc");
 
-        if ($sort == "name") {
-            $users = User::orderBy("name", $order);
-        } elseif ($sort == "created_at") {
-            $users = User::orderBy("created_at", $order);
-        } else {
-            $users = User::query();
-        }
+        $users = User::orderBy($sort, $sortOrder)->get();
 
-        $users = $users->get();
-
-        return view("users.index", ["users" => $users]);
+        return view("users", compact("users", "sort", "sortOrder"));
     }
 }

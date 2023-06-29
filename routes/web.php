@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 
@@ -25,22 +27,14 @@ Route::get("/dashboard", function () {
     ->middleware(["auth", "verified"])
     ->name("dashboard");
 
-Route::get("/users", function () {
-    $sort = request()->query("sort", "name");
-    $sortOrder = request()->query("sort_order", "asc");
-
-    $users = User::orderBy($sort, $sortOrder)->get();
-
-    return view("users", compact("users", "sort", "sortOrder"));
-})
+Route::get("/users", [UserController::class, "index"])
     ->middleware(["auth", "verified"])
     ->name("users");
 
-Route::get("/map", function () {
-    return view("map");
-})
-    ->middleware(["auth", "verified"])
-    ->name("map");
+Route::resource("/locations", LocationController::class)->middleware([
+    "auth",
+    "verified",
+]);
 
 Route::middleware("auth")->group(function () {
     Route::get("/profile", [ProfileController::class, "edit"])->name(

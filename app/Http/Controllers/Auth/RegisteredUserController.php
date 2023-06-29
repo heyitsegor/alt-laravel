@@ -10,7 +10,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -22,11 +21,6 @@ class RegisteredUserController extends Controller
     public function create(): View
     {
         return view("auth.register");
-    }
-
-    protected function validator(array $data)
-    {
-        return Validator::make($data, User::$rules);
     }
 
     /**
