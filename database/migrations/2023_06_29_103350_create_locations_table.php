@@ -17,8 +17,8 @@ return new class extends Migration {
                 ->constrained()
                 ->onDelete("cascade");
             $table->string("label");
-            $table->decimal("latitude", 11, 8);
-            $table->decimal("longitude", 11, 8);
+            $table->decimal("latitude", 7, 5);
+            $table->decimal("longitude", 7, 5);
             $table->timestamps();
         });
     }
