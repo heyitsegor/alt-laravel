@@ -8,7 +8,7 @@
 
     function init() {
         const locations = <?php echo json_encode($locations); ?>
-        const selectedLocationId = <?php echo json_encode($selectedLocationId); ?>
+        const selectedLocationId = <?php echo json_encode($selectedLocationId); ?>;
         const selectedLocation = locations.find((location) => location.id === selectedLocationId)
 
         const geolocation = ymaps.geolocation
