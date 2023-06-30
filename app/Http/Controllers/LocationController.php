@@ -22,10 +22,6 @@ class LocationController extends Controller
         );
     }
 
-    // public function edit(Location $location)
-    // {
-    //     return view("locations.edit", compact("location"));
-    // }
 
     public function store(Request $request): RedirectResponse
     {

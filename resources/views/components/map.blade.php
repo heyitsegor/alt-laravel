@@ -9,7 +9,7 @@
     function init() {
         const locations = <?php echo json_encode($locations); ?>;
         const selectedLocationId = <?php echo json_encode($selectedLocationId); ?>;
-        const selectedLocation = locations.find((location) => location.id === selectedLocationId)
+        const selectedLocation = locations.filter((location) => location.id == selectedLocationId)[0]
 
         const geolocation = ymaps.geolocation
         const myMap = new ymaps.Map('map', {
@@ -32,9 +32,13 @@
 
 
         locations.forEach((location) => {
-            var myPlacemark = new ymaps.Placemark([location.latitude, location.longitude], {}, {
-                preset: 'islands#redCircleIcon'
-            });
+            var myPlacemark = new ymaps.Placemark(
+                [location.latitude, location.longitude], {
+                    balloonContentBody: location.label,
+                }, {
+                    preset: 'islands#redCircleIcon',
+
+                });
             myMap.geoObjects.add(myPlacemark);
         })
     }
