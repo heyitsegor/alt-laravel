@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Location;
+use App\Http\Requests\LocationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\View\View;
 
 class LocationController extends Controller
 {
@@ -14,12 +16,15 @@ class LocationController extends Controller
         $locations = auth()->user()->locations;
         $selectedLocationId = $request->get("location");
 
-        return view("locations", compact("locations", "selectedLocationId"));
+        return view(
+            "locations.index",
+            compact("locations", "selectedLocationId")
+        );
     }
 
-    public function create()
+    public function edit(Location $location)
     {
-        return view("locations.create");
+        return view("locations.edit", compact("location"));
     }
 
     public function store(Request $request): RedirectResponse
@@ -48,33 +53,17 @@ class LocationController extends Controller
         );
     }
 
-    public function edit(Location $location)
-    {
-        return view("locations", compact("location"));
-    }
-
     public function update(
-        Request $request,
+        LocationRequest $request,
         Location $location
     ): RedirectResponse {
-        $request->validate([
-            "label" => "required",
-            "latitude" => "required",
-            "longitude" => "required",
-        ]);
-
-        $location->fill([
-            "label" => $request->get("label"),
-            "latitude" => $request->get("latitude"),
-            "longitude" => $request->get("longitude"),
-        ]);
+        $location->fill($request->validated());
 
         $location->save();
 
-        return Redirect::route("locations.index")->with(
-            "status",
-            "location-saved"
-        );
+        return redirect()
+            ->route("locations.index")
+            ->with("success", "Location saved!");
     }
 
     public function destroy(Location $location)
