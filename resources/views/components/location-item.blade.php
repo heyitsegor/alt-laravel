@@ -18,7 +18,7 @@
     </div>
 
     <div class="inline-flex items-center">
-        <form style="margin:0 .5rem 0 0 " method="post" action=" {{ route('locations.destroy', $id) }}">
+        <form method="post" action=" {{ route('locations.destroy', $id) }}">
             @csrf
             @method('delete')
 
