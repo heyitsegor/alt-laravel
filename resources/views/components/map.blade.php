@@ -13,7 +13,7 @@
 
         const geolocation = ymaps.geolocation
         const myMap = new ymaps.Map('map', {
-            center: [selectedLocation.latitude, selectedLocation.longitude],
+            center: selectedLocationId ? [selectedLocation.latitude, selectedLocation.longitude] : [0, 0],
             zoom: 10,
             controls: []
         }, {
