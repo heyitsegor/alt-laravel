@@ -24,9 +24,6 @@ class LocationController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        /**FIXME:
-        Latitude: -85 to +85
-        Longitude: -180 to +180**/
         $request->validate([
             "label" => [
                 "required",

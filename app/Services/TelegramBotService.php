@@ -25,7 +25,7 @@ class TelegramBotService
         ];
     }
 
-    public function sendMessage($text = "", $chatId, $replyToMessage)
+    public function sendMessage($chatId, $replyToMessage, $text = "")
     {
         $result = ["success" => false, "body" => []];
 
@@ -35,7 +35,7 @@ class TelegramBotService
             "text" => $text,
         ];
 
-        $url = "{$this->api_endpoint}/{$this->token}/sendMessage";
+        $url = "{$this->apiEndpoint}/{$this->token}/sendMessage";
 
         try {
             $response = Http::withHeaders($this->headers)->post($url, $params);
