@@ -24,17 +24,14 @@ Route::get("/", function () {
 Route::get("/dashboard", function () {
     return view("dashboard");
 })
-    ->middleware(["auth", "verified"])
+    ->middleware(["auth"])
     ->name("dashboard");
 
 Route::get("/users", [UserController::class, "index"])
-    ->middleware(["auth", "verified"])
+    ->middleware(["auth"])
     ->name("users");
 
-Route::resource("/locations", LocationController::class)->middleware([
-    "auth",
-    "verified",
-]);
+Route::resource("/locations", LocationController::class)->middleware(["auth"]);
 
 Route::middleware("auth")->group(function () {
     Route::get("/profile", [ProfileController::class, "edit"])->name(
