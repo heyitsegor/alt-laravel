@@ -43,19 +43,9 @@ class LocationController extends Controller
                 "numeric",
                 "min:-85",
                 "max:85",
-                Rule::unique("locations")->where(function ($query) use (
-                    $request
-                ) {
-                    return $query
-                        ->where("user_id", auth()->id())
-                        ->where("longitude", $request->get("longitude"));
-                }),
-                Rule::unique("locations")->where(function ($query) use (
-                    $request
-                ) {
-                    return $query
-                        ->where("user_id", auth()->id())
-                        ->where("latitude", $request->get("latitude"));
+                Rule::unique('locations')->where(function ($query) use ($request) {
+                    return $query->where('user_id', auth()->id())
+                                 ->where('longitude', '!=', $request->get('longitude'));
                 }),
             ],
             "longitude" => [
@@ -63,19 +53,9 @@ class LocationController extends Controller
                 "numeric",
                 "min:-180",
                 "max:180",
-                Rule::unique("locations")->where(function ($query) use (
-                    $request
-                ) {
-                    return $query
-                        ->where("user_id", auth()->id())
-                        ->where("latitude", $request->get("latitude"));
-                }),
-                Rule::unique("locations")->where(function ($query) use (
-                    $request
-                ) {
-                    return $query
-                        ->where("user_id", auth()->id())
-                        ->where("longitude", $request->get("longitude"));
+                Rule::unique('locations')->where(function ($query) use ($request) {
+                    return $query->where('user_id', auth()->id())
+                                 ->where('latitude', '!=', $request->get('latitude'));
                 }),
             ],
         ]);
