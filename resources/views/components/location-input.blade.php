@@ -30,14 +30,14 @@
 
             <div class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 <x-input-label for="latitude" :value="__('Latitude')" />
-                <x-text-input id="latitude" name="latitude" type="text" class="mt-1 block w-full" :value="old('label', $location->latitude ?? '')"
+                <x-text-input id="latitude" name="latitude" type="text" class="mt-1 block w-full" :value="old('latitude', $location->latitude ?? '')"
                     required />
                 <x-input-error class="mt-2" :messages="$errors->get('latitude')" />
             </div>
 
             <div class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 <x-input-label for="longitude" :value="__('Longitude')" />
-                <x-text-input id="longitude" name="longitude" type="text" class="mt-1 block w-full" :value="old('label', $location->longitude ?? '')"
+                <x-text-input id="longitude" name="longitude" type="text" class="mt-1 block w-full" :value="old('longitude', $location->longitude ?? '')"
                     required />
                 <x-input-error class="mt-2" :messages="$errors->get('longitude')" />
             </div>
