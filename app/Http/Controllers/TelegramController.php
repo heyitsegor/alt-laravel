@@ -20,5 +20,8 @@ class TelegramController extends Controller
         } else {
             $text = "Hi again!";
         }
+
+        $result = app('telegram_bot')->sendMessage($text, $chatId, $replyToMessage);
+        return response()-> json($result, 200)
     }
 }
