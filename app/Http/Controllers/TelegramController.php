@@ -17,7 +17,7 @@ class TelegramController extends Controller
         \Log::info("reply_to_message: {$replyToMessage}");
 
         if (!cache()->has("chat_id_{$chatId}")) {
-            $text = "Welcome to alt-laravel-bot \r\n";
+            $text = "Welcome to alt-laravel-bot";
 
             cache()->put("chat_id_{$chatId}", true, now()->addMinute());
         } else {
