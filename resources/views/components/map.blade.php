@@ -32,7 +32,7 @@
 
 
         locations.forEach((location) => {
-            var myPlacemark = new ymaps.Placemark(
+            const myPlacemark = new ymaps.Placemark(
                 [location.latitude, location.longitude], {
                     balloonContentBody: location.label,
                 }, {

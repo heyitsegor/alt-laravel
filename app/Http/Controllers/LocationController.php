@@ -22,16 +22,32 @@ class LocationController extends Controller
         );
     }
 
-
     public function store(Request $request): RedirectResponse
     {
         /**FIXME:
         Latitude: -85 to +85
         Longitude: -180 to +180**/
         $request->validate([
-            "label" => ["required", "string", "max:255"],
-            "latitude" => ["required", "numeric", "min:-85", "max:85"],
-            "longitude" => ["required", "numeric", "min:-180", "max:180"],
+            "label" => [
+                "required",
+                "string",
+                "max:255",
+                "unique:" . Location::class,
+            ],
+            "latitude" => [
+                "required",
+                "numeric",
+                "min:-85",
+                "max:85",
+                "unique:" . Location::class,
+            ],
+            "longitude" => [
+                "required",
+                "numeric",
+                "min:-180",
+                "max:180",
+                "unique:" . Location::class,
+            ],
         ]);
 
         $location = new Location([
