@@ -7,7 +7,7 @@ use App\Http\Requests\LocationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 
 class LocationController extends Controller
 {
@@ -32,21 +32,51 @@ class LocationController extends Controller
                 "required",
                 "string",
                 "max:255",
-                "unique:" . Location::class,
+                Rule::unique("locations")->where(function ($query) use (
+                    $request
+                ) {
+                    return $query->where("user_id", auth()->id());
+                }),
             ],
             "latitude" => [
                 "required",
                 "numeric",
                 "min:-85",
                 "max:85",
-                "unique:" . Location::class,
+                Rule::unique("locations")->where(function ($query) use (
+                    $request
+                ) {
+                    return $query
+                        ->where("user_id", auth()->id())
+                        ->where("longitude", $request->get("longitude"));
+                }),
+                Rule::unique("locations")->where(function ($query) use (
+                    $request
+                ) {
+                    return $query
+                        ->where("user_id", auth()->id())
+                        ->where("latitude", $request->get("latitude"));
+                }),
             ],
             "longitude" => [
                 "required",
                 "numeric",
                 "min:-180",
                 "max:180",
-                "unique:" . Location::class,
+                Rule::unique("locations")->where(function ($query) use (
+                    $request
+                ) {
+                    return $query
+                        ->where("user_id", auth()->id())
+                        ->where("latitude", $request->get("latitude"));
+                }),
+                Rule::unique("locations")->where(function ($query) use (
+                    $request
+                ) {
+                    return $query
+                        ->where("user_id", auth()->id())
+                        ->where("longitude", $request->get("longitude"));
+                }),
             ],
         ]);
 
