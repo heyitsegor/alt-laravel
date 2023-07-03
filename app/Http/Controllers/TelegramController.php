@@ -13,10 +13,13 @@ class TelegramController extends Controller
         $chatId = $request->message["from"]["id"];
         $replyToMessage = $request->message["message_id"];
 
-        if (!cache()->has("chat_id_{$chatId}")) {
-            $text = "Welcome to alt-laravel-bot ";
+        \Log::info("chat_id: {$chatId}");
+        \Log::info("reply_to_message: {$replyToMessage}");
 
-            cache()->put("chat_id_{$chatId}", true, now()->addMinute(60));
+        if (!cache()->has("chat_id_{$chatId}")) {
+            $text = "Welcome to alt-laravel-bot \r\n";
+
+            cache()->put("chat_id_{$chatId}", true, now()->addMinute());
         } else {
             $text = "Hi again!";
         }
@@ -26,6 +29,7 @@ class TelegramController extends Controller
             $chatId,
             $replyToMessage
         );
+
         return response()->json($result, 200);
     }
 }
