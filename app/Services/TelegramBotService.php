@@ -12,8 +12,8 @@ class TelegramBotService
 
     public function __construct()
     {
-        $this->token = env("TELEGRAM_BOT_TOKEN");
-        $this->apiEndpoint = env("TELEGRAM_API_ENDPOINT");
+        $this->token = env("TELEGRAM_API_TOKEN");
+        $this->apiEndpoint = env("TELEGRAM_API_URL");
         $this->setHeaders();
     }
 
@@ -25,20 +25,14 @@ class TelegramBotService
         ];
     }
 
-    public function sendMessage($text = "", $chatId, $replyToMessageId)
+    public function sendMessage($data)
     {
         $result = ["success" => false, "body" => []];
-
-        $params = [
-            "chat_id" => $chatId,
-            "reply_to_message_id" => $replyToMessageId,
-            "text" => $text,
-        ];
 
         $url = "{$this->apiEndpoint}/{$this->token}/sendMessage";
 
         try {
-            $response = Http::withHeaders($this->headers)->post($url, $params);
+            $response = Http::withHeaders($this->headers)->post($url, $data);
             $result = [
                 "success" => $response->ok(),
                 "body" => $response->json(),
