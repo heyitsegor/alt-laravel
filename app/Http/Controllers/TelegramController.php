@@ -63,7 +63,7 @@ class TelegramController extends Controller
                     $name .
                     " за текущую неделю составило: " .
                     gmdate("H:i", $totalHours) .
-                    "\n";
+                    "\n\n";
             }
         } elseif ($callbackData == "get_report_by_project") {
             $hubstaffService = new HubstaffService();
@@ -77,14 +77,11 @@ class TelegramController extends Controller
             $text = "";
 
             foreach ($projects as $project) {
-                $username = $project["user"];
                 $projectTitle = $project["title"];
                 $totalHours = $project["totalHours"];
 
                 $text .=
-                    "Время работы пользователя " .
-                    $username .
-                    " над проектом " .
+                    "Время работы над проектом " .
                     $projectTitle .
                     " составляет: " .
                     gmdate("H:i", $totalHours) .

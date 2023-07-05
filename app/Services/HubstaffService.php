@@ -25,107 +25,52 @@ class HubstaffService
         ];
     }
 
+    protected function sendRequest(
+        string $method,
+        string $url,
+        array $formData = null
+    ) {
+        try {
+            $response = Http::withHeaders($this->headers)->$method(
+                $this->baseUrl . $url,
+                $formData
+            );
+            return $response->json();
+        } catch (\Throwable $th) {
+            return ["error" => $th->getMessage()];
+        }
+    }
+
     protected function getOrganizationId()
     {
-        $result = ["success" => false, "body" => []];
-
-        $url = "{$this->baseUrl}/v2/organizations";
-
-        try {
-            $response = Http::withHeaders($this->headers)->get($url);
-
-            $data = json_decode($response, true);
-            \Log::info("organisations", ["result" => $data]);
-            $id = $data["organizations"][0]["id"];
-
-            $result = [
-                "success" => $response->ok(),
-                "body" => $id,
-            ];
-        } catch (\Throwable $th) {
-            $result["error"] = $th->getMessage();
-        }
-
-        return $result;
+        $data = $this->sendRequest("get", "/v2/organizations");
+        return $data["organizations"][0]["id"];
     }
 
     protected function getActivityData($organizationId)
     {
-        $result = ["success" => false, "body" => []];
-
         $startDate = date("Y-m-d", strtotime("last monday midnight"));
         $endDate = date("Y-m-d");
+        $url = "/v2/organizations/{$organizationId}/activities/daily?date[start]={$startDate}&date[stop]={$endDate}";
 
-        \Log::info("organisation id:", ["id" => $organizationId]);
-
-        $url = "{$this->baseUrl}/v2/organizations/{$organizationId}/activities/daily?date[start]={$startDate}&date[stop]={$endDate}";
-
-        try {
-            $response = Http::withHeaders($this->headers)->get($url);
-
-            $result = [
-                "success" => $response->ok(),
-                "body" => $response->json(),
-            ];
-        } catch (\Throwable $th) {
-            $result["error"] = $th->getMessage();
-        }
-
-        return $result;
+        return $this->sendRequest("get", $url);
     }
 
     protected function getUsernameById($userId)
     {
-        $result = ["success" => false, "body" => []];
-
-        $url = "{$this->baseUrl}/v2/users/{$userId}";
-
-        try {
-            $response = Http::withHeaders($this->headers)->get($url);
-
-            $data = json_decode($response, true);
-            $name = $data["user"]["name"];
-
-            $result = [
-                "success" => $response->ok(),
-                "body" => $name,
-            ];
-        } catch (\Throwable $th) {
-            $result["error"] = $th->getMessage();
-        }
-
-        return $result;
+        $data = $this->sendRequest("get", "/v2/users/{$userId}");
+        return $data["user"]["name"];
     }
 
     protected function getProjectTitles($organizationId)
     {
-        $result = ["success" => false, "body" => []];
+        $data = $this->sendRequest(
+            "get",
+            "/v2/organizations/{$organizationId}/projects"
+        );
+        $projectTitles = array_column($data["projects"], "name", "id");
 
-        $url = "{$this->baseUrl}/v2/organizations/{$organizationId}/projects";
-
-        try {
-            $response = Http::withHeaders($this->headers)->get($url);
-
-            $data = json_decode($response, true);
-        } catch (\Throwable $th) {
-            $result["error"] = $th->getMessage();
-        }
-
-        $projectsTracked = [];
-
-        foreach ($data["projects"] as $project) {
-            $projectId = $project["id"];
-            $projectTitle = $project["name"];
-
-            $projectsTracked[$projectId] = $projectTitle;
-        }
-
-        $result = [
-            "success" => $response->ok(),
-            "body" => $projectsTracked,
-        ];
-
-        return $result;
+        return $projectTitles;
     }
 
     protected function getWeeklyTime($data)
@@ -133,7 +78,7 @@ class HubstaffService
         $usersTracked = [];
         foreach ($data["daily_activities"] as $activity) {
             $userId = $activity["user_id"];
-            $userName = $this->getUsernameById($userId)["body"];
+            $userName = $this->getUsernameById($userId);
 
             $time = $activity["tracked"];
 
@@ -157,8 +102,6 @@ class HubstaffService
         $projectsTracked = [];
 
         foreach ($data["daily_activities"] as $activity) {
-            $userId = $activity["user_id"];
-            $userName = $this->getUsernameById($userId)["body"];
             $projectId = $activity["project_id"];
             $projectTitle = $titles[$projectId];
 
@@ -166,7 +109,6 @@ class HubstaffService
 
             if (!isset($projectsTracked[$projectTitle])) {
                 $projectsTracked[$projectTitle] = [
-                    "user" => $userName,
                     "title" => $projectTitle,
                     "totalHours" => 0,
                 ];
@@ -183,15 +125,15 @@ class HubstaffService
     public function getFullReport()
     {
         $organizationId = $this->getOrganizationId();
-        $activityData = $this->getActivityData($organizationId["body"]);
-        return $this->getWeeklyTime($activityData["body"]);
+        $activityData = $this->getActivityData($organizationId);
+        return $this->getWeeklyTime($activityData);
     }
 
     public function getReportByProject()
     {
         $organizationId = $this->getOrganizationId();
-        $activityData = $this->getActivityData($organizationId["body"]);
-        $titleData = $this->getProjectTitles($organizationId["body"]);
-        return $this->getProjectTime($activityData["body"], $titleData["body"]);
+        $activityData = $this->getActivityData($organizationId);
+        $titleData = $this->getProjectTitles($organizationId);
+        return $this->getProjectTime($activityData, $titleData);
     }
 }
