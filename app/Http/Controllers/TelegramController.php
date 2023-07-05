@@ -56,13 +56,11 @@ class TelegramController extends Controller
 
             foreach ($users as $user) {
                 $name = $user["name"];
-                $totalHours = $user["totalHours"];
+                $totalSeconds = $user["totalHours"];
 
-                $totalSeconds = $totalHours;
-                $totalDays = floor($totalSeconds / (24 * 60 * 60));
-                $remainingSeconds = $totalSeconds % (24 * 60 * 60);
-                $timeString =
-                    $totalDays . " дней, " . gmdate("H:i", $remainingSeconds);
+                $totalHours = floor($totalSeconds / 3600);
+                $totalMinutes = floor(($totalSeconds / 60) % 60);
+                $timeString = $totalHours . ":" . $totalMinutes;
 
                 $text .=
                     "Общее время пользователя " .
@@ -84,14 +82,12 @@ class TelegramController extends Controller
 
             foreach ($projects as $project) {
                 $projectTitle = $project["title"];
-                $totalHours = $project["totalHours"];
+                $totalSeconds = $project["totalHours"];
 
-                $totalSeconds = $totalHours;
-                $totalDays = floor($totalSeconds / (24 * 60 * 60));
-                $remainingSeconds = $totalSeconds % (24 * 60 * 60);
-                $timeString =
-                    $totalDays . " дней, " . gmdate("H:i", $remainingSeconds);
+                $totalHours = floor($totalSeconds / 3600);
+                $totalMinutes = floor(($totalSeconds / 60) % 60);
 
+                $timeString = $totalHours . ":" . $totalMinutes;
                 $text .=
                     "Время работы над проектом " .
                     $projectTitle .
