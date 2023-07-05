@@ -58,11 +58,17 @@ class TelegramController extends Controller
                 $name = $user["name"];
                 $totalHours = $user["totalHours"];
 
+                $totalSeconds = $totalHours;
+                $totalDays = floor($totalSeconds / (24 * 60 * 60));
+                $remainingSeconds = $totalSeconds % (24 * 60 * 60);
+                $timeString =
+                    $totalDays . " дней, " . gmdate("H:i", $remainingSeconds);
+
                 $text .=
                     "Общее время пользователя " .
                     $name .
                     " за текущую неделю составило: " .
-                    gmdate("H:i", $totalHours) .
+                    $timeString .
                     "\n\n";
             }
         } elseif ($callbackData == "get_report_by_project") {
@@ -80,11 +86,17 @@ class TelegramController extends Controller
                 $projectTitle = $project["title"];
                 $totalHours = $project["totalHours"];
 
+                $totalSeconds = $totalHours;
+                $totalDays = floor($totalSeconds / (24 * 60 * 60));
+                $remainingSeconds = $totalSeconds % (24 * 60 * 60);
+                $timeString =
+                    $totalDays . " дней, " . gmdate("H:i", $remainingSeconds);
+
                 $text .=
                     "Время работы над проектом " .
                     $projectTitle .
                     " составляет: " .
-                    gmdate("H:i", $totalHours) .
+                    $timeString .
                     ".\n\n";
             }
         } else {
