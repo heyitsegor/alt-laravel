@@ -21,22 +21,48 @@ class HubstaffService
     {
         $this->headers = [
             "Authorization" => "Bearer {$this->token}",
-            // "Content-Type" => "application/json",
             "Accept" => "application/json",
         ];
     }
-    public function fetchTime()
+
+    protected function getOrganizationId()
     {
         $result = ["success" => false, "body" => []];
 
-        $start_date = date("Y-m-d", strtotime("last monday"));
-        $end_date = date("Y-m-d");
-
-        $url = "{$this->baseUrl}/v2/organizations/519709/activities/daily?date[start]={$start_date}&date[stop]={$end_date}";
-        // $url = "{$this->baseUrl}/v2/organizations/519709/activities/daily?date[start]=2023-07-04T19:50:36+00:00&date[stop]=2023-07-04T19:50:36+00:00";
+        $url = "{$this->baseUrl}/v2/organizations";
 
         try {
             $response = Http::withHeaders($this->headers)->get($url);
+
+            $data = json_decode($response, true);
+            \Log::info("organisations", ["result" => $data]);
+            $id = $data["organizations"][0]["id"];
+
+            $result = [
+                "success" => $response->ok(),
+                "body" => $id,
+            ];
+        } catch (\Throwable $th) {
+            $result["error"] = $th->getMessage();
+        }
+
+        return $result;
+    }
+
+    protected function getActivityData($organizationId)
+    {
+        $result = ["success" => false, "body" => []];
+
+        $startDate = date("Y-m-d", strtotime("last monday midnight"));
+        $endDate = date("Y-m-d");
+
+        \Log::info("organisation id:", ["id" => $organizationId]);
+
+        $url = "{$this->baseUrl}/v2/organizations/{$organizationId}/activities/daily?date[start]={$startDate}&date[stop]={$endDate}";
+
+        try {
+            $response = Http::withHeaders($this->headers)->get($url);
+
             $result = [
                 "success" => $response->ok(),
                 "body" => $response->json(),
@@ -45,43 +71,127 @@ class HubstaffService
             $result["error"] = $th->getMessage();
         }
 
-        $data = [
-            "user_id" => $response["daily_activities"][0]["user_id"],
-            "time" => $response["daily_activities"][0]["tracked"],
+        return $result;
+    }
+
+    protected function getUsernameById($userId)
+    {
+        $result = ["success" => false, "body" => []];
+
+        $url = "{$this->baseUrl}/v2/users/{$userId}";
+
+        try {
+            $response = Http::withHeaders($this->headers)->get($url);
+
+            $data = json_decode($response, true);
+            $name = $data["user"]["name"];
+
+            $result = [
+                "success" => $response->ok(),
+                "body" => $name,
+            ];
+        } catch (\Throwable $th) {
+            $result["error"] = $th->getMessage();
+        }
+
+        return $result;
+    }
+
+    protected function getProjectTitles($organizationId)
+    {
+        $result = ["success" => false, "body" => []];
+
+        $url = "{$this->baseUrl}/v2/organizations/{$organizationId}/projects";
+
+        try {
+            $response = Http::withHeaders($this->headers)->get($url);
+
+            $data = json_decode($response, true);
+        } catch (\Throwable $th) {
+            $result["error"] = $th->getMessage();
+        }
+
+        $projectsTracked = [];
+
+        foreach ($data["projects"] as $project) {
+            $projectId = $project["id"];
+            $projectTitle = $project["name"];
+
+            $projectsTracked[$projectId] = $projectTitle;
+        }
+
+        $result = [
+            "success" => $response->ok(),
+            "body" => $projectsTracked,
         ];
 
-        \Log::info("Hubstaff->fetch_users->result", $data);
-
-        return $response->json();
+        return $result;
     }
 
-    public function fetch_weekly_time($user_id)
+    protected function getWeeklyTime($data)
     {
-        $start_date = date("Y-m-d", strtotime("last monday"));
-        $end_date = date("Y-m-d");
+        $usersTracked = [];
+        foreach ($data["daily_activities"] as $activity) {
+            $userId = $activity["user_id"];
+            $userName = $this->getUsernameById($userId)["body"];
 
-        $response = Http::withHeaders([
-            "Authorization" => "Bearer {$this->token}",
-            "Content-Type" => "application/json",
-        ])->get(
-            $this->baseUrl .
-                "weekly_team_report/{$user_id}?start_date={$start_date}&end_date={$end_date}"
-        );
+            $time = $activity["tracked"];
 
-        return $response->json();
+            if (!isset($usersTracked[$userName])) {
+                $usersTracked[$userName] = [
+                    "name" => $userName,
+                    "totalHours" => 0,
+                ];
+            }
+
+            $usersTracked[$userName]["totalHours"] += $time;
+        }
+
+        $result = array_values($usersTracked);
+
+        return json_encode($result);
     }
 
-    public function get_report()
+    protected function getProjectTime($data, $titles)
     {
-        $time = $this->fetchTime();
-        $report = [];
+        $projectsTracked = [];
 
-        // foreach ($users as $user) {
-        //     $time_data = $this->fetch_weekly_time($user["id"]);
-        //     $total_seconds = $time_data["total_seconds"];
-        //     $report[] = "User: {$user["name"]}, Time: {$total_seconds} seconds";
-        // }
+        foreach ($data["daily_activities"] as $activity) {
+            $userId = $activity["user_id"];
+            $userName = $this->getUsernameById($userId)["body"];
+            $projectId = $activity["project_id"];
+            $projectTitle = $titles[$projectId];
 
-        return $report;
+            $time = $activity["tracked"];
+
+            if (!isset($projectsTracked[$projectTitle])) {
+                $projectsTracked[$projectTitle] = [
+                    "user" => $userName,
+                    "title" => $projectTitle,
+                    "totalHours" => 0,
+                ];
+            }
+
+            $projectsTracked[$projectTitle]["totalHours"] += $time;
+        }
+
+        $result = array_values($projectsTracked);
+
+        return json_encode($result);
+    }
+
+    public function getFullReport()
+    {
+        $organizationId = $this->getOrganizationId();
+        $activityData = $this->getActivityData($organizationId["body"]);
+        return $this->getWeeklyTime($activityData["body"]);
+    }
+
+    public function getReportByProject()
+    {
+        $organizationId = $this->getOrganizationId();
+        $activityData = $this->getActivityData($organizationId["body"]);
+        $titleData = $this->getProjectTitles($organizationId["body"]);
+        return $this->getProjectTime($activityData["body"], $titleData["body"]);
     }
 }

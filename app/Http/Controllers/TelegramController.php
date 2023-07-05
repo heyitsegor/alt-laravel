@@ -12,6 +12,24 @@ class TelegramController extends Controller
         \Log::info($request->all());
 
         $chatId = null;
+        $callbackData = null;
+        $keyboard = [
+            "inline_keyboard" => [
+                [
+                    [
+                        "text" => "Полный отчет",
+                        "callback_data" => "get_full_report",
+                    ],
+                ],
+                [
+                    [
+                        "text" => "Отчет по каждому проекту",
+                        "callback_data" => "get_report_by_project",
+                    ],
+                ],
+            ],
+        ];
+
         if (isset($request->message) && isset($request->message["from"])) {
             $chatId = $request->message["from"]["id"];
         }
@@ -25,51 +43,65 @@ class TelegramController extends Controller
 
         \Log::info("chat_id: {$chatId}");
 
-        if (isset($request->message["message_id"])) {
-            $replyToMessageId = $request->message["message_id"];
-            \Log::info("reply_to_message: {$replyToMessageId}");
-        }
-
-        $callbackData = null;
-
         if (isset($request->callback_query["data"])) {
             $callbackData = $request->callback_query["data"];
             \Log::info("callback: {$callbackData}");
         }
 
-        if ($callbackData == "get_report") {
+        if ($callbackData == "get_full_report") {
             $hubstaffService = new HubstaffService();
-            $report = $hubstaffService->get_report();
 
-            $data = [
-                "chat_id" => $chatId,
-                "text" => implode("\n", $report),
-            ];
+            $users = json_decode($hubstaffService->getFullReport(), true);
+            $text = "";
 
-            $result = app("telegram_bot")->sendMessage($data);
+            foreach ($users as $user) {
+                $name = $user["name"];
+                $totalHours = $user["totalHours"];
 
-            return response()->json($result, 200);
-        }
+                $text .=
+                    "Общее время пользователя " .
+                    $name .
+                    " за текущую неделю составило: " .
+                    gmdate("H:i", $totalHours) .
+                    "\n";
+            }
+        } elseif ($callbackData == "get_report_by_project") {
+            $hubstaffService = new HubstaffService();
 
-        if (!cache()->has("chat_id_{$chatId}")) {
-            $text = "Welcome to alt-laravel-bot";
+            $projects = json_decode(
+                $hubstaffService->getReportByProject(),
+                true
+            );
 
-            cache()->put("chat_id_{$chatId}", true, now()->addMinute());
+            \Log::info("projects", ["body" => $projects]);
+            $text = "";
+
+            foreach ($projects as $project) {
+                $username = $project["user"];
+                $projectTitle = $project["title"];
+                $totalHours = $project["totalHours"];
+
+                $text .=
+                    "Время работы пользователя " .
+                    $username .
+                    " над проектом " .
+                    $projectTitle .
+                    " составляет: " .
+                    gmdate("H:i", $totalHours) .
+                    ".\n\n";
+            }
         } else {
-            // $text = "Hi again!";
-            $text = "Press the button below for information:";
-        }
+            if (!cache()->has("chat_id_{$chatId}")) {
+                $text = "Welcome to alt-laravel-bot";
 
-        $keyboard = [
-            "inline_keyboard" => [
-                [["text" => "Info", "callback_data" => "info"]],
-                [["text" => "Get Report", "callback_data" => "get_report"]],
-            ],
-        ];
+                cache()->put("chat_id_{$chatId}", true, now()->addMinute());
+            } else {
+                $text = "Press the button below for information:";
+            }
+        }
 
         $data = [
             "chat_id" => $chatId,
-            "reply_to_message_id" => $replyToMessageId,
             "text" => $text,
             "reply_markup" => json_encode($keyboard),
         ];
