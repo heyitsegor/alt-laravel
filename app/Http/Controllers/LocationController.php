@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Gate;
 
 class LocationController extends Controller
 {
@@ -82,6 +83,9 @@ class LocationController extends Controller
         LocationRequest $request,
         Location $location
     ): RedirectResponse {
+        if (!Gate::allows("update-location", $location)) {
+            abort(403);
+        }
         $location->fill($request->validated());
 
         $location->save();
@@ -93,6 +97,9 @@ class LocationController extends Controller
 
     public function destroy(Location $location)
     {
+        if (!Gate::allows("delete-location", $location)) {
+            abort(403);
+        }
         $location->delete();
 
         return redirect("/locations");
